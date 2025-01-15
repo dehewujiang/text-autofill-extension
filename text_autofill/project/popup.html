@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Text Autofill</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 350px;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f8f9fa;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 16px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    #save {
+      background: #1a73e8;
+      color: white;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    #save:hover {
+      background: #1557b0;
+    }
+
+    #export, #import {
+      flex: 1;
+      background: #f1f3f4;
+      color: #1a73e8;
+    }
+
+    #export:hover, #import:hover {
+      background: #e8eaed;
+    }
+
+    .shortcut-list {
+      margin-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 16px;
+    }
+
+    .shortcut-list h3 {
+      font-size: 14px;
+      color: #5f6368;
+      margin-bottom: 12px;
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .shortcut-item:hover {
+      background: #f1f3f4;
+    }
+
+    .delete-btn {
+      color: #dc3545;
+      font-size: 18px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      opacity: 0.7;
+    }
+
+    .delete-btn:hover {
+      opacity: 1;
+      background: rgba(220,53,69,0.1);
+    }
+
+    #status {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    #status.show {
+      opacity: 1;
+    }
+
+    .shortcut-text {
+      color: #202124;
+    }
+
+    .shortcut-key {
+      color: #1a73e8;
+      font-weight: 500;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      font-size: 12px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+
+    .loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border: 2px solid #1a73e8;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .shortcut-tip {
+      font-size: 12px;
+      color: #5f6368;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .category-select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .category-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-right: 8px;
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .category-filter {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .category-filter button {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      background: #f1f3f4;
+      color: #5f6368;
+    }
+
+    .category-filter button.active {
+      background: #1a73e8;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">文本快捷输入</h1>
+    <input type="text" id="shorthand" placeholder="输入简写（不需要/）" autocomplete="off">
+    <input type="text" id="text" placeholder="输入要自动填充的文本" autocomplete="off">
+    <select id="category" class="category-select">
+      <option value="">选择分类...</option>
+      <option value="常用">常用</option>
+      <option value="工作">工作</option>
+      <option value="个人">个人</option>
+      <option value="其他">其他</option>
+    </select>
+    <button id="save">保存快捷键</button>
+    <div class="btn-group">
+      <button id="export">导出配置</button>
+      <button id="import">导入配置</button>
+    </div>
+    <input type="text" id="search" placeholder="搜索快捷键..." autocomplete="off">
+    <div id="categoryFilter" class="category-filter">
+      <button data-category="" class="active">全部</button>
+    </div>
+    <div id="shortcut-list" class="shortcut-list"></div>
+  </div>
+  <div id="status"></div>
+  <input type="file" id="fileInput" style="display: none" accept=".json">
+  <div class="shortcut-tip">
+    提示：在任意输入框中输入 / 加简写即可自动填充文本
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
